@@ -146,7 +146,6 @@ abstract class Configurable
 
             $element->set((int) $key, $value);
         } else if ($element === null) {
-            /*print_r(compact('key'));*/
             static::$configurations->set($key, $value);
         } else {
             throw new InvalidArgumentException(sprintf('Type %s has no values', gettype($element)));
