@@ -18,8 +18,8 @@ use Ivyhjk\Config\Configurable;
  * @copyright Copyright (c) 2016, Elvis Munoz
  * @licence https://opensource.org/licenses/MIT MIT License
  */
- /* HH_FIXME[4123] */
-class ConfigurableTest extends TestCase
+ /* HH_FIXME[4123] */ /* HH_FIXME[2049] */
+class ConfigurableTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Configurables can not be created by instance.
@@ -30,7 +30,7 @@ class ConfigurableTest extends TestCase
     {
         $reflection = new ReflectionMethod(SecondFakeConfigurable::class, '__construct');
 
-        $this->assertFalse($reflection->isPublic());
+        static::assertFalse($reflection->isPublic());
     }
 
     /**
@@ -42,7 +42,7 @@ class ConfigurableTest extends TestCase
     {
         $reflection = new ReflectionMethod(SecondFakeConfigurable::class, '__clone');
 
-        $this->assertFalse($reflection->isPublic());
+        static::assertFalse($reflection->isPublic());
     }
 
     /**
@@ -54,7 +54,7 @@ class ConfigurableTest extends TestCase
     {
         $reflection = new ReflectionMethod(SecondFakeConfigurable::class, '__sleep');
 
-        $this->assertFalse($reflection->isPublic());
+        static::assertFalse($reflection->isPublic());
 
         $this->expectException(LogicException::class);
         serialize(SecondFakeConfigurable::getInstance());
@@ -68,7 +68,7 @@ class ConfigurableTest extends TestCase
     public function test_unserialize() : void
     {
         $reflection = new ReflectionMethod(SecondFakeConfigurable::class, '__wakeup');
-        $this->assertFalse($reflection->isPublic());
+        static::assertFalse($reflection->isPublic());
 
         $serialized = 'O:41:"Ivyhjk\Test\Config\SecondFakeConfigurable":0:{}';
         $this->expectException(LogicException::class);
@@ -87,7 +87,7 @@ class ConfigurableTest extends TestCase
         $config = FirstFakeConfigurable::getInstance();
 
         // depth 1, any
-        $this->assertEquals($config->get('first'), Map{
+        static::assertEquals($config->get('first'), Map{
             'test' => 1,
             'string' => 'test',
             'vector' => Vector{'one', 'two', 'three'}
@@ -107,20 +107,20 @@ class ConfigurableTest extends TestCase
         $config = FirstFakeConfigurable::getInstance();
 
         // depth 2, int
-        $this->assertSame($config->get('first.test'), 1);
+        static::assertSame($config->get('first.test'), 1);
 
         // depth 2, string
-        $this->assertSame($config->get('first.string'), 'test');
+        static::assertSame($config->get('first.string'), 'test');
 
         // depth 2, Vector
-        $this->assertEquals($config->get('first.vector'), Vector{
+        static::assertEquals($config->get('first.vector'), Vector{
             'one',
             'two',
             'three'
         });
 
         // depth 2, Vector, first value
-        $this->assertSame($config->get('first.vector.1'), 'two');
+        static::assertSame($config->get('first.vector.1'), 'two');
     }
 
     /**
@@ -134,7 +134,7 @@ class ConfigurableTest extends TestCase
         $config = FirstFakeConfigurable::getInstance();
 
         // really depth.
-        $this->assertSame($config->get('multiple.first.second.third.fourth'), 4);
+        static::assertSame($config->get('multiple.first.second.third.fourth'), 4);
     }
 
     /**
@@ -148,8 +148,8 @@ class ConfigurableTest extends TestCase
     {
         $third = ThirdFakeConfigurable::getInstance();
 
-        $this->assertSame($third->get('first.test'), 1);
-        $this->assertSame($third->get('multiple.first.second.third.fourth'), 4);
+        static::assertSame($third->get('first.test'), 1);
+        static::assertSame($third->get('multiple.first.second.third.fourth'), 4);
     }
 
     /**
@@ -162,8 +162,8 @@ class ConfigurableTest extends TestCase
     public function test_correct_inheritance_override() : void
     {
         $second = SecondFakeConfigurable::getInstance();
-        $this->assertNull($second->get('first.test'));
-        $this->assertSame($second->get('second.config'), 2);
+        static::assertNull($second->get('first.test'));
+        static::assertSame($second->get('second.config'), 2);
     }
 
     /**
@@ -180,7 +180,7 @@ class ConfigurableTest extends TestCase
 
         $firstFakeConfigurable->set($path, $value);
 
-        $this->assertSame($firstFakeConfigurable->get($path), $value);
+        static::assertSame($firstFakeConfigurable->get($path), $value);
     }
 
     /**
@@ -214,7 +214,7 @@ class ConfigurableTest extends TestCase
         $value = 'new-two-value';
 
         $firstFakeConfigurable->set($path, $value);
-        $this->assertSame($firstFakeConfigurable->get($path), $value);
+        static::assertSame($firstFakeConfigurable->get($path), $value);
     }
 
     /**
@@ -231,7 +231,7 @@ class ConfigurableTest extends TestCase
         $value = 'new-path-value';
 
         $firstFakeConfigurable->set($path, $value);
-        $this->assertSame($firstFakeConfigurable->get($path), $value);
+        static::assertSame($firstFakeConfigurable->get($path), $value);
     }
 
     /**
