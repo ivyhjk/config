@@ -1,6 +1,6 @@
 {
     "name": "ivyhjk/config",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "keywords": ["hhvm", "configuration"],
     "description": "Abstractr configurations for HHVM",
     "require": {
