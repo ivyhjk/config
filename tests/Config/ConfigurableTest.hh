@@ -235,16 +235,100 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test the setter with an invalid path.
+     * Test the setter with multiple values on path input and value input.
      *
      * @return void
      */
-    public function test_setter_invalid_key() : void
+    public function test_setter_many_key_values() : void
     {
         $firstFakeConfigurable = FirstFakeConfigurable::getInstance();
 
-        $this->expectException(InvalidArgumentException::class);
         $firstFakeConfigurable->set('first.string.fake', 'new-fake-value');
+        static::assertSame(
+            'new-fake-value',
+            $firstFakeConfigurable->get('first.string.fake')
+        );
+    }
+
+    /**
+     * Test the correct workflow for prepareForSet method.
+     * This test contemplate a non string keys given.
+     *
+     * @return void
+     */
+    public function test_prepare_for_set_non_string_keys() : void
+    {
+        $firstFakeConfigurable = FirstFakeConfigurable::getInstance();
+
+        $keys = ['foo' => 'bar'];
+
+        static::assertSame($keys, $firstFakeConfigurable->prepareForSet($keys, 'baz'));
+    }
+
+    /**
+     * Test the correct workflow for prepareForSet method.
+     * This test contemplate an existent "final value".
+     *
+     * @return void
+     */
+    public function test_prepare_for_set_with_final_value() : void
+    {
+        $firstFakeConfigurable = FirstFakeConfigurable::getInstance();
+
+        $value = $firstFakeConfigurable->prepareForSet('foo', 'bar', 'baz');
+
+        $expected = Map{
+            'foo' => Map{
+                'bar' => 'baz'
+            }
+        };
+
+        static::assertEquals($expected, $value);
+    }
+
+    /**
+     * Test the correct workflow for prepareForSet method.
+     * This test contemplates a single key (a key without dot)
+     *
+     * @return void
+     */
+    public function test_prepare_for_set_with_one_key() : void
+    {
+        $firstFakeConfigurable = FirstFakeConfigurable::getInstance();
+
+        $value = $firstFakeConfigurable->prepareForSet('foo', 'bar');
+
+        $expected = Map{
+            'foo' => 'bar'
+        };
+
+        static::assertEquals($expected, $value);
+    }
+
+    /**
+     * Test the correct workflow for prepareForSet method.
+     * This test contemplates a multiple key (a key with dots)
+     *
+     * @return void
+     */
+    public function test_prepare_for_set_with_multiple_key() : void
+    {
+        $firstFakeConfigurable = FirstFakeConfigurable::getInstance();
+
+        $value = $firstFakeConfigurable->prepareForSet(
+            'foo.bar.baz',
+            'fake-value'
+        );
+
+        $expected = Map{
+            'foo' => Map{
+                'bar' => Map{
+                    'baz' => 'fake-value'
+                }
+            }
+        };
+
+        static::assertEquals($expected, $value);
     }
 }
 

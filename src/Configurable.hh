@@ -111,6 +111,10 @@ abstract class Configurable
                 $node = $node->get($path);
             } else if ($node instanceof Vector && is_numeric($path)) {
                 $node = $node->at((int) $path);
+            } else if ($node instanceof KeyedContainer)  {
+                $node = new Map($node);
+
+                $node = $node->get($path);
             } else {
                 return $node;
             }
@@ -120,16 +124,52 @@ abstract class Configurable
     }
 
     /**
-     * Description of what this does.
+     * Prepare the values for set method.
      *
-     * @param mixed $myVar Short description
+     * @param mixed $keys Possible keys for values.
+     * @param mixed $value The associated value.
+     * @param mixed $finalValue The possible "final" value into the map configurations.
      *
-     * @return void
+     * @return mixed
+     */
+    public function prepareForSet(mixed $keys, mixed $value, mixed $finalValue = null) : mixed
+    {
+        if ( ! is_string($keys)) {
+            return $keys;
+        }
+
+        if ($finalValue !== null) {
+            $formatted = $this->prepareForSet($value, $finalValue);
+
+            return Map{$keys => $formatted};
+        } else {
+            $explodedKeys = explode('.', $keys);
+
+            if (count($explodedKeys) === 1) {
+                return Map{$keys => $value};
+            }
+
+            $key = array_shift($explodedKeys);
+            $newValues = implode('.', $explodedKeys);
+
+            return $this->prepareForSet($key, $newValues, $value);
+        }
+    }
+
+    /**
+     * Set a new value into configurations.
+     *
+     * @param string $path The configuration path.
+     * @param mixed $value The configuration value.
+     *
+     * @return Ivyhjk\Config\Configurable
      * @throws LogicException When key is not numeric on vector configuration.
      */
     public function set(string $path, mixed $value) : Configurable
     {
-        $paths = explode('.', $path);
+        $explodedPath = explode('.', $path);
+
+        $paths = $explodedPath;
 
         $key = array_pop($paths);
 
@@ -145,10 +185,18 @@ abstract class Configurable
             }
 
             $element->set((int) $key, $value);
-        } else if ($element === null) {
-            static::$configurations->set($key, $value);
         } else {
-            throw new InvalidArgumentException(sprintf('Type %s has no values', gettype($element)));
+            if (count($explodedPath) === 1) {
+                static::$configurations->set($key, $value);
+            } else {
+                $formatted = $this->prepareForSet($path, $value);
+
+                if ( ! $formatted instanceof KeyedTraversable) {
+                    throw new \Exception('Invalid configuration.');
+                }
+
+                static::$configurations->setAll($formatted);
+            }
         }
 
         return $this;
