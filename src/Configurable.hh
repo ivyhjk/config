@@ -143,13 +143,16 @@ abstract class Configurable
 
             return Map{$keys => $formatted};
         } else {
-            $explodedKeys = explode('.', $keys);
+            $explodedKeys = new Vector(explode('.', $keys));
 
-            if (count($explodedKeys) === 1) {
+            if ($explodedKeys->count() === 1) {
                 return Map{$keys => $value};
             }
 
-            $key = array_shift($explodedKeys);
+            $key = $explodedKeys->firstValue();
+
+            $explodedKeys->removeKey(0);
+
             $newValues = implode('.', $explodedKeys);
 
             return $this->prepareForSet($key, $newValues, $value);
@@ -169,9 +172,9 @@ abstract class Configurable
     {
         $explodedPath = explode('.', $path);
 
-        $paths = $explodedPath;
+        $paths = new Vector($explodedPath);
 
-        $key = array_pop($paths);
+        $key = $paths->pop();
 
         $relativePath = implode('.', $paths);
 
