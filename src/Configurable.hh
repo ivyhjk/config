@@ -78,7 +78,7 @@ abstract class Configurable
      */
     final public static function getInstance() : Configurable
     {
-        $class = get_called_class();
+        $class = \get_called_class();
         $instance = self::$instances->get($class);
 
         if ($instance === null) {
@@ -102,7 +102,7 @@ abstract class Configurable
             return static::$configurations;
         }
 
-        $paths = explode('.', $path);
+        $paths = \explode('.', $path);
 
         $node = static::$configurations;
 
@@ -143,7 +143,7 @@ abstract class Configurable
 
             return Map{$keys => $formatted};
         } else {
-            $explodedKeys = new Vector(explode('.', $keys));
+            $explodedKeys = new Vector(\explode('.', $keys));
 
             if ($explodedKeys->count() === 1) {
                 return Map{$keys => $value};
@@ -153,7 +153,7 @@ abstract class Configurable
 
             $explodedKeys->removeKey(0);
 
-            $newValues = implode('.', $explodedKeys);
+            $newValues = \implode('.', $explodedKeys);
 
             return $this->prepareForSet($key, $newValues, $value);
         }
@@ -170,13 +170,13 @@ abstract class Configurable
      */
     public function set(string $path, mixed $value) : Configurable
     {
-        $explodedPath = explode('.', $path);
+        $explodedPath = \explode('.', $path);
 
         $paths = new Vector($explodedPath);
 
         $key = $paths->pop();
 
-        $relativePath = implode('.', $paths);
+        $relativePath = \implode('.', $paths);
 
         $element = $this->get($relativePath);
 
@@ -189,7 +189,7 @@ abstract class Configurable
 
             $element->set((int) $key, $value);
         } else {
-            if (count($explodedPath) === 1) {
+            if (\count($explodedPath) === 1) {
                 static::$configurations->set($key, $value);
             } else {
                 $formatted = $this->prepareForSet($path, $value);
