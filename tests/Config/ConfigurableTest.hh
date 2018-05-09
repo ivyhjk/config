@@ -57,7 +57,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
         static::assertFalse($reflection->isPublic());
 
         $this->expectException(LogicException::class);
-        serialize(SecondFakeConfigurable::getInstance());
+        \serialize(SecondFakeConfigurable::getInstance());
     }
 
     /**
@@ -72,7 +72,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
 
         $serialized = 'O:41:"Ivyhjk\Test\Config\SecondFakeConfigurable":0:{}';
         $this->expectException(LogicException::class);
-        unserialize($serialized);
+        \unserialize($serialized);
     }
 
     /**
