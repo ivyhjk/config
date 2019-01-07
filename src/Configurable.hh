@@ -2,42 +2,37 @@
 
 namespace Ivyhjk\Config;
 
-use LogicException;
-use InvalidArgumentException;
-
 /**
  * Configuration base class.
  *
- * @since v0.0.1
- * @version v0.0.1
- * @package Ivyhjk\Config
- * @author Elvis Munoz <elvis.munoz.f@gmail.com>
+ * @since     v1.0.0
+ * @version   v1.1.0
+ * @package   Ivyhjk\Config
+ * @author    Elvis Munoz <elvis.munoz.f@gmail.com>
  * @copyright Copyright (c) 2016, Elvis Munoz
- * @licence https://opensource.org/licenses/MIT MIT License
+ * @license   https://opensource.org/licenses/MIT MIT License
  */
-abstract class Configurable
-{
+abstract class Configurable {
     /**
      * Class unique instances pool.
      *
      * @var Map<string, Ivyhjk\Config\Configurable>
      */
-    private static Map<string, Configurable> $instances = Map{};
+    private static Map<string, Configurable> $instances = Map {};
 
     /**
      * Store all configurations.
      *
      * @var Map<string, mixed>
      */
-    protected static Map<string, mixed> $configurations = Map{};
+    protected static Map<string, mixed> $configurations = Map {};
 
     /**
      * Constructor MUST be private, config.
      *
      * @return void
      */
-    final protected function __construct() : void
-    {
+    final protected function __construct(): void {
 
     }
 
@@ -46,8 +41,7 @@ abstract class Configurable
      *
      * @return void
      */
-    private function __clone() : void
-    {
+    private function __clone(): void {
 
     }
 
@@ -56,9 +50,8 @@ abstract class Configurable
      *
      * @return void
      */
-    private function __sleep() : void
-    {
-        throw new LogicException('Object can not be serialized.');
+    private function __sleep(): void {
+        throw new \LogicException('Object can not be serialized.');
     }
 
     /**
@@ -66,9 +59,8 @@ abstract class Configurable
      *
      * @return void
      */
-    private function __wakeup() : void
-    {
-        throw new LogicException('Object can not be unserialized.');
+    private function __wakeup(): void {
+        throw new \LogicException('Object can not be unserialized.');
     }
 
     /**
@@ -76,8 +68,7 @@ abstract class Configurable
      *
      * @return Ivyhjk\Config\Configurable
      */
-    final public static function getInstance() : Configurable
-    {
+    final public static function getInstance(): Configurable {
         $class = \get_called_class();
         $instance = self::$instances->get($class);
 
@@ -96,8 +87,7 @@ abstract class Configurable
      *
      * @return mixed
      */
-    public function get(?string $path = null) : mixed
-    {
+    public function get(?string $path = null): mixed {
         if ($path === null) {
             return static::$configurations;
         }
@@ -110,8 +100,8 @@ abstract class Configurable
             if ($node instanceof Map) {
                 $node = $node->get($path);
             } else if ($node instanceof Vector && is_numeric($path)) {
-                $node = $node->at((int) $path);
-            } else if ($node instanceof KeyedContainer)  {
+                $node = $node->at((int)$path);
+            } else if ($node instanceof KeyedContainer) {
                 $node = new Map($node);
 
                 $node = $node->get($path);
@@ -132,21 +122,32 @@ abstract class Configurable
      *
      * @return mixed
      */
-    public function prepareForSet(mixed $keys, mixed $value, mixed $finalValue = null) : mixed
-    {
-        if ( ! is_string($keys)) {
+    public function prepareForSet(
+        mixed $keys,
+        mixed $value,
+        mixed $finalValue = null,
+    ): mixed {
+        if (!is_string($keys)) {
             return $keys;
         }
 
         if ($finalValue !== null) {
             $formatted = $this->prepareForSet($value, $finalValue);
 
-            return Map{$keys => $formatted};
+            if (!$keys is arraykey) {
+                throw new \UnexpectedValueException();
+            }
+
+            return Map {$keys => $formatted};
         } else {
-            $explodedKeys = new Vector(\explode('.', $keys));
+            $explodedKeys = new Vector(\explode('.', $keys as string));
 
             if ($explodedKeys->count() === 1) {
-                return Map{$keys => $value};
+                if (!$keys is arraykey) {
+                    throw new \UnexpectedValueException();
+                }
+
+                return Map {$keys => $value};
             }
 
             $key = $explodedKeys->firstValue();
@@ -168,8 +169,7 @@ abstract class Configurable
      * @return Ivyhjk\Config\Configurable
      * @throws LogicException When key is not numeric on vector configuration.
      */
-    public function set(string $path, mixed $value) : Configurable
-    {
+    public function set(string $path, mixed $value): Configurable {
         $explodedPath = \explode('.', $path);
 
         $paths = new Vector($explodedPath);
@@ -184,17 +184,19 @@ abstract class Configurable
             $element->set($key, $value);
         } else if ($element instanceof Vector) {
             if (is_numeric($key) !== true) {
-                throw new InvalidArgumentException('Only integer keys may be used with Vectors');
+                throw new \InvalidArgumentException(
+                    'Only integer keys may be used with Vectors',
+                );
             }
 
-            $element->set((int) $key, $value);
+            $element->set((int)$key, $value);
         } else {
             if (\count($explodedPath) === 1) {
                 static::$configurations->set($key, $value);
             } else {
                 $formatted = $this->prepareForSet($path, $value);
 
-                if ( ! $formatted instanceof KeyedTraversable) {
+                if (!$formatted instanceof KeyedTraversable) {
                     throw new \Exception('Invalid configuration.');
                 }
 
