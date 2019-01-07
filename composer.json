@@ -1,12 +1,18 @@
 {
     "name": "ivyhjk/config",
-    "keywords": ["hhvm", "configuration"],
-    "description": "Abstractr configurations for HHVM",
+    "keywords": [
+        "hhvm",
+        "configuration"
+    ],
+    "description": "Abstract configurations for HHVM",
     "require": {
-        "hhvm" : ">=3.0.0"
+        "hhvm": ">=3.30",
+        "hhvm/hhvm-autoload": "^1.7"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.4"
+        "hhvm/hacktest": "^1.3",
+        "facebook/fbexpect": "^2.3",
+        "hhvm/hhast": "^3.30"
     },
     "license": "MIT",
     "authors": [
@@ -14,15 +20,5 @@
             "name": "Elvis Munoz",
             "email": "elvis.munoz.f@gmail.com"
         }
-    ],
-    "autoload" : {
-        "psr-4" : {
-            "Ivyhjk\\Config\\" : "src/"
-        }
-    },
-    "autoload-dev" : {
-        "psr-4" : {
-            "Ivyhjk\\Test\\" : "tests/"
-        }
-    }
+    ]
 }
