@@ -2,7 +2,7 @@
 
 ## Installation
 
-You can install this plugin into your application using [composer](http://getcomposer.org).
+You can install this library into your application using [composer](http://getcomposer.org).
 
 Use this project just when you are not able to use environment variables.
 
